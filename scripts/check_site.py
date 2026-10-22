@@ -44,7 +44,8 @@ def target(path):
 
 def main():
     pages = sorted(SITE.rglob("*.html"))
-    postmap = json.loads((SITE / "postmap.json").read_text(encoding="utf-8"))
+    raw_postmap = json.loads((SITE / "postmap.json").read_text(encoding="utf-8"))
+    postmap = raw_postmap.get("map", raw_postmap)
     redirects = json.loads((SITE / "redirects.json").read_text(encoding="utf-8"))
     missing = Counter()
     unusual = Counter()
@@ -97,6 +98,9 @@ def main():
         if not post_id.isdecimal():
             missing[(post_id, "postmap", "bad ID")] += 1
             continue
+        if not destination.startswith(("http://", "https://", "/")):
+            destination = f"/{destination}/"
+        destination = redirects.get(destination, destination)
         parsed = urlparse(urljoin(f"https://{HOST}/", destination))
         if parsed.hostname == HOST and parsed.path not in redirects and not target(parsed.path).exists():
             missing[(destination, "postmap", post_id)] += 1
@@ -115,7 +119,7 @@ def main():
     print("Unusual service/feed references:")
     for item, count in unusual.most_common():
         print(count, item)
-    if len(pages) < 120 or len(postmap) != 71 or missing:
+    if len(pages) < 120 or len(postmap) < 71 or missing:
         sys.exit(1)
 
 

@@ -7,8 +7,8 @@ WordPress database, PHP installation, backups, caches, or credentials here.
 
 ## Contents
 
-- `site/`: 122 public HTML pages, 367 referenced assets, RSS, sitemap, and maps
-  for 71 old WordPress IDs and 11 redirected page slugs.
+- `site/`: public HTML pages, referenced assets, RSS, sitemap, and maps
+  for WordPress IDs and redirected page slugs.
 - `worker.mjs`: serves the site, redirects `www` to the primary domain, and
   preserves old `/p/ID`, `/p/?id=ID`, `/?p=ID`, and `/?page_id=ID` shortlinks.
   This also keeps `nbe.me/b/ID` links working because that domain sends visitors
@@ -46,3 +46,15 @@ site. All 122 pages were fetched successfully. Of 367 assets, 32 font files
 came from the local WordPress source because the old public font URLs were
 broken. No image needed a local fallback. The old AWS setup should remain
 available for rollback until the new site is accepted on both live addresses.
+
+## Local Staatic export
+
+For step-by-step instructions to publish a new post without assistance, see
+[PUBLISHING.md](PUBLISHING.md).
+
+The local Books WordPress installation uses the Staatic `Local Directory`
+deployment method. Docker mounts the ignored `.staatic-export/` folder in
+this repository as `/var/www/staatic-books`, the configured target directory.
+The saved S3 settings remain in WordPress but are not the selected method.
+
+After writing a new post, update the WordPress source postmap and run a full Staatic publication. Then run sync-books.cmd in this repository. It safely reconciles the export into site/ and runs the local checks. Review the changes before committing and pushing. See PUBLISHING.md for the short procedure.

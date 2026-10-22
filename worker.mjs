@@ -28,10 +28,21 @@ function oldPostId(url) {
   }
   const match = /^\/p\/(\d+)\/?$/.exec(url.pathname);
   if (match) return match[1];
-  if (url.pathname === "/p" || url.pathname === "/p/") {
+  if (url.pathname === "/p" || url.pathname === "/p/" || url.pathname === "/p/index.html") {
     return url.searchParams.get("id") || /^\?(\d+)(?:&|$)/.exec(url.search)?.[1];
   }
   return null;
+}
+
+function postDestination(postmap, redirects, postId) {
+  // Staatic publishes the original WordPress shape: {"map":{"707":"slug"}}.
+  // Also accept the initial Cloudflare snapshot's flat ID-to-URL shape.
+  const entries = postmap.map || postmap;
+  const value = entries[postId];
+  if (typeof value !== "string" || !value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = value.startsWith("/") ? value : "/" + value + "/";
+  return redirects[path] || path;
 }
 
 export default {
@@ -47,9 +58,13 @@ export default {
     const postId = oldPostId(url);
     if (postId && /^\d+$/.test(postId)) {
       try {
-        const map = await assetJson(env, url, "/postmap.json");
-        response = map[postId]
-          ? redirect(map[postId], url)
+        const [map, redirects] = await Promise.all([
+          assetJson(env, url, "/postmap.json"),
+          assetJson(env, url, "/redirects.json"),
+        ]);
+        const destination = postDestination(map, redirects, postId);
+        response = destination
+          ? redirect(destination, url)
           : new Response("Unknown post ID", { status: 404 });
       } catch {
         response = new Response("Shortlink map unavailable", { status: 503 });

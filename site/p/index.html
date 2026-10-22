@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting&hellip;</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #444;
+      margin: 0;
+    }
+    .msg { text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="msg"><p>Redirecting&hellip;</p></div>
+
+  <script>
+  (async function() {
+    function extractId() {
+      // 1) Clean path: /p/394 or /p/394/
+      //SELECT JSON_OBJECT('map', JSON_OBJECTAGG(ID, post_name)) AS postmap FROM wp_posts WHERE post_type IN ('post','page') AND post_status='publish';
+      const parts = location.pathname.replace(/\/+$/, '').split('/');
+      if (parts.length >= 3 && parts[1] === 'p' && /^\d+$/.test(parts[2])) return parts[2];
+
+      // 2) Keyed query: ?id=394
+      const sp = new URLSearchParams(location.search);
+      const byKey = sp.get('id');
+      if (byKey) return byKey;
+
+      // 3) Bare query: ?394
+      if (location.search && location.search.length > 1) {
+        const first = location.search.slice(1).split('&')[0];
+        if (/^\d+$/.test(first)) return first;
+      }
+      return null;
+    }
+
+    const id = extractId();
+ 
+    try {
+      if (!id) throw new Error("No ID");
+
+      // Always load the mapping from the ROOT
+      const res = await fetch("/postmap.json", { cache: "default" });
+      if (!res.ok) throw new Error("Map fetch failed");
+
+      const data = await res.json();
+      const map = data.map || data;
+      const value = map[id];
+      if (!value) throw new Error("ID not found in map");
+
+      // Redirect to the proper slug with a trailing slash
+      const dest = /^https?:\/\//i.test(value) || value === "/"
+        ? value
+        : "/" + value.replace(/^\/+|\/+$/g, "") + "/";
+      location.replace(dest);
+    } catch (e) {
+      location.replace("/404.html");
+    }
+  })();
+  </script>
+</body>
+</html>
+<!-- Powered by Staatic (https://staatic.com/) -->

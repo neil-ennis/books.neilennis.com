@@ -12,7 +12,7 @@
 	<atom:link href="/feed/" rel="self" type="application/rss+xml" />
 	<link>/</link>
 	<description>Books that I love</description>
-	<lastBuildDate>Sat, 10 Oct 2026 02:37:05 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 22 Oct 2026 05:13:49 +0000</lastBuildDate>
 	<language>en-AU</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
@@ -28,6 +28,23 @@
 	<height>32</height>
 </image> 
 	<item>
+		<title>Never Let Me Go</title>
+		<link>/never-let-me-go/</link>
+					<comments>/never-let-me-go/#respond</comments>
+		
+		<dc:creator><![CDATA[Neil.B.Ennis]]></dc:creator>
+		<pubDate>Thu, 22 Oct 2026 05:13:49 +0000</pubDate>
+				<category><![CDATA[Ishiguro]]></category>
+		<guid isPermaLink="false">/?p=707</guid>
+
+					<description><![CDATA[Title: Never Let Me Go Author: Kazuo Ishiguro Published: 2005 Pages: 288 Structure: 23 chapters in three parts *Never Let&#8230; ]]></description>
+		
+					<wfw:commentRss>/never-let-me-go/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
 		<title>Assassin&#8217;s Apprentice</title>
 		<link>/assassins-apprentice/</link>
 					<comments>/assassins-apprentice/#respond</comments>
@@ -347,23 +364,6 @@
 					<description><![CDATA[Title: The Little Prince (Le Petit Prince) Author: Antoine de Saint-Exupéry Written: 1943 Pages: 160 Structure: A novella with 27&#8230; ]]></description>
 		
 					<wfw:commentRss>/the-little-prince/feed/</wfw:commentRss>
-			<slash:comments>0</slash:comments>
-		
-		
-			</item>
-		<item>
-		<title>Cat&#8217;s Cradle</title>
-		<link>/cats-cradle/</link>
-					<comments>/cats-cradle/#respond</comments>
-		
-		<dc:creator><![CDATA[Neil.B.Ennis]]></dc:creator>
-		<pubDate>Fri, 22 May 2026 03:38:33 +0000</pubDate>
-				<category><![CDATA[Vonnegut]]></category>
-		<guid isPermaLink="false">/?p=561</guid>
-
-					<description><![CDATA[Title: Cat&#8217;s Cradle Author: Kurt Vonnegut Written: 1963 Pages: 306 Structure: A novel with 127 Chapters Cat&#8217;s Cradle is a&#8230; ]]></description>
-		
-					<wfw:commentRss>/cats-cradle/feed/</wfw:commentRss>
 			<slash:comments>0</slash:comments>
 		
 		

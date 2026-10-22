@@ -21,14 +21,23 @@ const env = {
 };
 
 async function response(path, host = "books.neilennis.com") {
-  return worker.fetch(new Request(`https://${host}${path}`), env);
+  return worker.fetch(new Request("https://" + host + path), env);
 }
 
-for (const [id, destination] of Object.entries(maps["/postmap.json"])) {
-  const actual = await response(`/p/${id}`);
-  assert.equal(actual.status, 301, `post ID ${id}`);
-  assert.equal(actual.headers.get("location"), new URL(destination, "https://books.neilennis.com").href);
+const postmap = maps["/postmap.json"].map || maps["/postmap.json"];
+const redirects = maps["/redirects.json"];
+function destinationFor(value) {
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = value.startsWith("/") ? value : "/" + value + "/";
+  return redirects[path] || path;
 }
+
+for (const [id, value] of Object.entries(postmap)) {
+  const actual = await response("/p/" + id);
+  assert.equal(actual.status, 301, "post ID " + id);
+  assert.equal(actual.headers.get("location"), new URL(destinationFor(value), "https://books.neilennis.com").href);
+}
+assert.equal((await response("/p/index.html?id=695")).headers.get("location"), "https://books.neilennis.com/assassins-apprentice/");
 assert.equal((await response("/p/?id=695")).headers.get("location"), "https://books.neilennis.com/assassins-apprentice/");
 assert.equal((await response("/p/?695")).headers.get("location"), "https://books.neilennis.com/assassins-apprentice/");
 assert.equal((await response("/?p=695")).headers.get("location"), "https://books.neilennis.com/assassins-apprentice/");
@@ -40,4 +49,13 @@ assert.equal((await response("/assassins-apprentice/?q=1", "www.books.neilennis.
 assert.equal((await response("/p/695", "books-neilennis-com.aged-night-bf73.workers.dev")).headers.get("location"), "https://books-neilennis-com.aged-night-bf73.workers.dev/assassins-apprentice/");
 assert.equal((await response("/", "books-neilennis-com.aged-night-bf73.workers.dev")).headers.get("X-Robots-Tag"), "noindex, nofollow");
 
-console.log(`Worker redirects passed for ${Object.keys(maps["/postmap.json"]).length} post IDs and key aliases.`);
+// Keep the flat map from the first Cloudflare snapshot compatible too.
+maps["/postmap.json"] = Object.fromEntries(
+  Object.entries(postmap).map(([id, value]) => [id, destinationFor(value)]),
+);
+for (const [id, destination] of Object.entries(maps["/postmap.json"])) {
+  const actual = await response("/p/" + id);
+  assert.equal(actual.headers.get("location"), new URL(destination, "https://books.neilennis.com").href);
+}
+
+console.log("Worker redirects passed for " + Object.keys(postmap).length + " post IDs in both map formats and key aliases.");
